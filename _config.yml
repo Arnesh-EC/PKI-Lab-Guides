@@ -1,0 +1,29 @@
+# Jekyll configuration for GitHub Pages
+title: "ADCS Two-Tier PKI Lab"
+description: >-
+  Build a two-tier Microsoft ADCS PKI hierarchy — offline root CA, enterprise
+  issuing CA, OCSP responder, and HTTP/LDAP CRL+AIA — with side-by-side GUI and
+  PowerShell steps.
+
+# Supported GitHub Pages theme (single-column, renders title + description in a header banner).
+theme: jekyll-theme-cayman
+
+# --- Site URL ---
+url: "https://arnesh-ec.github.io"
+baseurl: "/PKI-Lab-Guides"
+
+# Apply the theme's layout to every Markdown page (the two guides only carry empty
+# front matter, so this is what actually themes them).
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Keep the large source HTML out of the built site.
+exclude:
+  - reference_article.html
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor
