@@ -1,0 +1,164 @@
+/* ---- 1. Reboot essentials ------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ---- 2. Bootstrap 5 subset ----------------------------------------------- */
+/* Containers */
+.container,
+.container-fluid {
+  width: 100%;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+@media (min-width: 576px) { .container { max-width: 540px; } }
+@media (min-width: 768px) { .container { max-width: 720px; } }
+@media (min-width: 992px) { .container { max-width: 960px; } }
+@media (min-width: 1200px) { .container { max-width: 1140px; } }
+
+/* Navbar lays out its container as a flex row (Bootstrap's .navbar rules) */
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.navbar > .container,
+.navbar > .container-fluid {
+  display: flex;
+  flex-wrap: inherit;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Grid columns used by the content / table-of-contents row.
+   The row is a plain .d-flex (not .row), so — exactly as in the original —
+   columns carry no gutter padding, only widths. */
+.col-12 { flex: 0 0 auto; width: 100%; }
+@media (min-width: 992px) { .col-lg-9 { flex: 0 0 auto; width: 75%; } }
+@media (min-width: 1200px) { .col-xl-8 { flex: 0 0 auto; width: 66.6666666667%; } }
+
+/* Nav list reset (sidebar <ul class="nav">) */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+.nav-link { display: block; }
+.flex-column { flex-direction: column !important; }
+
+/* Display */
+.d-block { display: block !important; }
+.d-flex { display: flex !important; }
+@media (min-width: 768px) { .d-md-none { display: none !important; } }
+
+/* Flex */
+.flex-row { flex-direction: row !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+.justify-content-end { justify-content: flex-end !important; }
+.justify-content-between { justify-content: space-between !important; }
+.justify-content-center { justify-content: center !important; }
+.align-items-center { align-items: center !important; }
+.gap-2 { gap: 0.5rem !important; }
+
+/* Text */
+.text-center { text-align: center !important; }
+
+/* Position */
+.sticky-top { position: sticky; top: 0; z-index: 1020; }
+
+/* Collapsible placeholder (#header-nav) */
+.collapse:not(.show) { display: none; }
+
+/* ---- 2b. JS-free behaviours (replacing the removed theme.js) -------------- */
+/* Mobile sidebar toggle via the checkbox hack: the hamburger / close <label>s
+   flip #nav-toggle, and on small screens a checked box slides the sidebar in.
+   #content is a general sibling of the checkbox inside #main-wrapper. */
+.nav-toggle { position: absolute; opacity: 0; pointer-events: none; }
+@media (max-width: 767.98px) {
+  .nav-toggle:checked ~ #content .idocs-navigation { margin-left: 0; }
+  .nav-toggle:checked ~ #content .close-sidebar { display: block; }
+}
+
+/* TOC sub-headings (h3) indented under their h2 (was JS-built nesting). */
+.table-of-contents .toc-h3 { padding-left: 2.2rem; }
+
+/* Back-to-top has no JS to reveal it on scroll, so keep it always visible
+   and use it as a plain smooth-scroll anchor (html/body set scroll-behavior). */
+#back-to-top {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- 3. Fenced code blocks (kramdown + rouge output) --------------------- */
+/* Light GitHub-style box; replaces highlight.js's github.css.
+   NOTE: stylesheet.css repurposes `.highlight` as a red inline-highlight
+   helper (color:#f00; background:#ffe3e3), but rouge wraps every code block in
+   <div class="highlighter-rouge"><div class="highlight"><pre class="highlight">.
+   These rules win on specificity and undo that pink styling inside content. */
+.idocs-content .highlighter-rouge {
+  background: #f6f8fa;
+  border-radius: 6px;
+  margin-top: 0.8rem;
+  margin-bottom: 1.0rem;
+  overflow: hidden;
+}
+.idocs-content .highlighter-rouge .highlight {
+  color: inherit;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+.idocs-content pre.highlight {
+  margin: 0;
+  padding: 12px 16px;
+  overflow: auto;
+}
+.idocs-content pre code,
+.idocs-content pre.highlight code {
+  display: block;
+  padding: 8px 12px;
+  background: none;
+  border-radius: 0;
+  color: #24292e;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+/* ---- 4. Markdown tables (bare <table>, GitHub-green iDocs flavour) -------- */
+.idocs-content table {
+  border-collapse: collapse;
+  margin-bottom: 1.8rem;
+  max-width: 100%;
+  overflow: scroll;
+}
+.idocs-content table th,
+.idocs-content table td {
+  border: 1px solid #d9d9d9;
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.idocs-content table th {
+  background-color: #0aa06a;
+  color: #fff;
+}
+.idocs-content table tbody tr:nth-child(even) td {
+  background-color: #f7f7f7;
+}

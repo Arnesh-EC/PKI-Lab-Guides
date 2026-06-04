@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no"
+    />
+    {%- comment -%}
+      Resolve this page's nav entry (label + position) from site.nav, the single
+      source for the sidebar, breadcrumb and pagination. index.md has url "/",
+      so normalize it to "/index.html" to match the nav entries.
+    {%- endcomment -%}
+    {%- assign cur_url = page.url -%}
+    {%- if cur_url == '/' -%}{%- assign cur_url = '/index.html' -%}{%- endif -%}
+    {%- assign current_label = page.title -%}
+    {%- assign current_index = -1 -%}
+    {%- for item in site.nav -%}
+      {%- if item.url == cur_url -%}
+        {%- assign current_label = item.title -%}
+        {%- assign current_index = forloop.index0 -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    <title>{{ current_label | default: site.title }}{% if current_label and current_label != site.title %} | {{ site.title }}{% endif %}</title>
+    <meta name="description" content="{{ page.description | default: site.description | strip_newlines }}" />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" type="text/css" href="{{ '/assets/css/base.css' | relative_url }}" />
+    <link rel="stylesheet" type="text/css" href="{{ '/assets/css/stylesheet.css' | relative_url }}" />
+    <!-- Syntax highlighting: GitHub-style Rouge theme (server-side; no JS). -->
+    <link rel="stylesheet" type="text/css" href="{{ '/assets/css/syntax.css' | relative_url }}" />
+    {% include head-custom.html %}
+  </head>
+
+  <body>
+    <div id="main-wrapper">
+      <!-- CSS-only sidebar toggle (no JS): the hamburger/close labels flip this. -->
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" tabindex="-1" />
+
+      <!-- Sidebar -->
+      <div id="content" role="main">
+        <div class="idocs-navigation bg-dark">
+          <div class="navbar">
+            <div class="container-fluid">
+              <h4 class="site-title">{{ site.title }}</h4>
+              <label for="nav-toggle" id="closeSideBar" class="close-sidebar" role="button" aria-label="Close navigation">
+                <svg id="Layer_6" height="18" width="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" data-name="Layer 6">
+                  <path d="m97.7 503.54c105.53 11.28 211.06 11.28 316.59 0 43.01-4.99 84.26-46.24 89.25-89.25 11.28-105.53 11.28-211.06 0-316.59-4.99-43.01-46.24-84.25-89.25-89.25-105.53-11.28-211.06-11.28-316.59 0-43.01 5-84.25 46.24-89.24 89.25-11.28 105.53-11.28 211.06 0 316.59 4.99 43.01 46.24 84.25 89.25 89.25zm49.21-275.12 123.02-123.02c15.23-15.23 39.92-15.23 55.15 0s15.23 39.92 0 55.15l-95.44 95.44 95.44 95.44c15.23 15.23 15.23 39.92 0 55.15-7.61 7.61-17.6 11.42-27.58 11.42s-19.96-3.81-27.58-11.42l-123.02-123.02c-15.23-15.23-15.23-39.92 0-55.15z" fill="#6a6a6a"></path>
+                </svg>
+              </label>
+            </div>
+          </div>
+          <!-- Sidebar nav — built statically from site.nav (see _config.yml). -->
+          <ul class="nav">
+            {%- for item in site.nav -%}
+              <li class="nav-item">
+                <a class="nav-link{% if item.url == cur_url %} active{% endif %}" href="{{ item.url | relative_url }}">{{ item.title }}</a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </div>
+
+      <!-- ----------------------------Main Content---------------------------- -->
+      <div class="idocs-content">
+        <div class="d-flex flex-row flex-wrap gap-2">
+          <div class="col-12 col-lg-9 col-xl-8">
+            {{ content }}
+          </div>
+          <div class="">
+            <div class="toc-container">
+              <h6 class="toc-heading">On this Page:</h6>
+              <!-- Table of contents — built statically from the page's h2/h3 headings. -->
+              <div class="table-of-contents">
+                {%- assign heading_chunks = content | split: '<h' -%}
+                <ul>
+                {%- for chunk in heading_chunks offset: 1 -%}
+                  {%- assign level = chunk | slice: 0, 1 -%}
+                  {%- if level == '2' or level == '3' -%}
+                    {%- assign id_parts = chunk | split: 'id="' -%}
+                    {%- if id_parts.size > 1 -%}
+                      {%- assign hid = id_parts[1] | split: '"' | first -%}
+                      {%- assign after_open = chunk | split: '>' -%}
+                      {%- assign inner = after_open | slice: 1, 200 | join: '>' | split: '</h' | first | strip_html | strip -%}
+                      <li class="toc-h{{ level }}"><a href="#{{ hid }}">{{ inner }}</a></li>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paginator — prev/next built statically from site.nav. -->
+        {%- assign total = site.nav | size -%}
+        {%- assign prev_index = current_index | minus: 1 -%}
+        {%- assign next_index = current_index | plus: 1 -%}
+        <div class="paginator">
+          {%- if current_index > 0 -%}
+            {%- assign prev = site.nav[prev_index] -%}
+            <a class="prev-page" href="{{ prev.url | relative_url }}" title="{{ prev.title }}">
+          {%- else -%}
+            <a class="prev-page disabled">
+          {%- endif -%}
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="10" viewBox="0 0 24 12" fill="none">
+              <path d="M0.46967 5.46967C0.176777 5.76256 0.176777 6.23744 0.46967 6.53033L5.24264 11.3033C5.53553 11.5962 6.01041 11.5962 6.3033 11.3033C6.59619 11.0104 6.59619 10.5355 6.3033 10.2426L2.06066 6L6.3033 1.75736C6.59619 1.46447 6.59619 0.989593 6.3033 0.696699C6.01041 0.403806 5.53553 0.403806 5.24264 0.696699L0.46967 5.46967ZM1 6V6.75H24V6V5.25H1V6Z" fill="black" />
+            </svg>
+          </a>
+          <span id="page-info">{% if current_index >= 0 %}{{ current_index | plus: 1 }} OF {{ total }}{% endif %}</span>
+          {%- if current_index >= 0 and next_index < total -%}
+            {%- assign next = site.nav[next_index] -%}
+            <a class="next-page" href="{{ next.url | relative_url }}" title="{{ next.title }}">
+          {%- else -%}
+            <a class="next-page disabled">
+          {%- endif -%}
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="10" viewBox="0 0 24 12" fill="none">
+              <path d="M23.5303 6.53033C23.8232 6.23744 23.8232 5.76256 23.5303 5.46967L18.7574 0.696699C18.4645 0.403806 17.9896 0.403806 17.6967 0.696699C17.4038 0.989593 17.4038 1.46447 17.6967 1.75736L21.9393 6L17.6967 10.2426C17.4038 10.5355 17.4038 11.0104 17.6967 11.3033C17.9896 11.5962 18.4645 11.5962 18.7574 11.3033L23.5303 6.53033ZM23 6V5.25H0V6V6.75H23V6Z" fill="black" />
+            </svg>
+          </a>
+        </div>
+      </div>
+      <!-- -------------------------------------------------------- -->
+    </div>
+
+    <!-- Back to top (anchor link; relies on CSS smooth-scroll) -->
+    <a id="back-to-top" title="Back to Top" href="#">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M8 4.5l5 5-1.06 1.06L8 6.62l-3.94 3.94L3 9.5z" fill="currentColor" />
+      </svg>
+    </a>
+
+    <script>
+      (function () {
+        const liFor = {};
+        document
+          .querySelectorAll('.table-of-contents a[href^="#"]')
+          .forEach(function (a) {
+            liFor[a.getAttribute("href").slice(1)] = a.parentElement;
+          });
+
+        const headings = document.querySelectorAll(
+          ".idocs-content h2[id], .idocs-content h3[id]"
+        );
+        if (!headings.length) return;
+
+        let current = null;
+        const observer = new IntersectionObserver(
+          function (entries) {
+            const visible = entries
+              .filter(function (e) { return e.isIntersecting; })
+              .sort(function (a, b) {
+                return a.boundingClientRect.top - b.boundingClientRect.top;
+              });
+            if (!visible.length) return;
+            const li = liFor[visible[0].target.id];
+            if (!li || li === current) return;
+            if (current) current.classList.remove("active");
+            current = li;
+            li.classList.add("active");
+            li.scrollIntoView({ block: "nearest" }); // keep visible in long TOCs
+          },
+          { rootMargin: "-5% 0px -60% 0px" }
+        );
+        headings.forEach(function (h) { observer.observe(h); });
+      })();
+    </script>
+  </body>
+</html>

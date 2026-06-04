@@ -112,7 +112,7 @@ The foundation of the forest; also serves the LDAP-based CDP/AIA.
 - Install **AD-integrated DNS** during DC promotion (set the preferred DNS to 192.168.1.90
   after restart, replacing the loopback default).
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Install the AD DS forest + DNS (on DC01)</summary>
 
 ```powershell
@@ -140,7 +140,7 @@ Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 192.168.1
   `CertEnroll` content (SRV1), and decouples the URLs baked into issued certs from the
   physical host so the web tier can later be moved or load-balanced without reissuing certs.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Create the PKI CNAME (on DC01)</summary>
 
 ```powershell
@@ -158,7 +158,7 @@ Add-DnsServerResourceRecordCName -ZoneName "EncryptionConsulting.com" `
   🔗 *Prereq: CA02 installed & issuing (its cert must exist, step 6) and SRV1 OCSP responder
   live (step 7). Perform near the end — not during initial DC setup.*
 
-<details>
+<details markdown="1">
 <summary>⏳ 💻 PowerShell — Export the Issuing CA cert for the GPO import (on CA02)</summary>
 
 > **GUI step — no clean PowerShell equivalent.** Pushing a cert into a GPO's *Intermediate
@@ -194,7 +194,7 @@ Keep it **not domain-joined and not connected to any network**. Rename the compu
   domain-joined), with a new private key and default cryptography.
 - Set the CA common name to **EC-Root-CA** with a **20-year** cert validity.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Rename, write CAPolicy.inf, install + configure the root CA (on CA01)</summary>
 
 ```powershell
@@ -232,7 +232,7 @@ Install-AdcsCertificationAuthority -CAType StandaloneRootCA `
 - Auditing: enable **Audit Object Access** (Success+Failure) in Local Security Policy and
   set `CA\AuditFilter 127` (all CA events)
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Apply post-install CA registry settings (on CA01)</summary>
 
 ```powershell
@@ -265,7 +265,7 @@ Restart-Service CertSvc
 
 Then run `net stop/start certsvc` and `certutil -crl` to publish.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Set AIA + CDP publication URLs and publish the CRL (on CA01)</summary>
 
 ```powershell
@@ -286,7 +286,7 @@ media.*
 - Receive the CA02 request (`certreq -submit`), issue the cert via the Certification
   Authority console (Pending Requests → Issue), and retrieve it (`certreq -retrieve`).
 
-<details>
+<details markdown="1">
 <summary>⏳ 💻 PowerShell — Sign CA02's request and retrieve the issued cert (on CA01)</summary>
 
 ```powershell
@@ -315,7 +315,7 @@ Domain-joined, online CA that actually issues end-entity certificates.
 
 - Rename the computer `CA02`, then **join the `EncryptionConsulting.com`** domain.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Rename + join the domain (on CA02)</summary>
 
 ```powershell
@@ -333,7 +333,7 @@ Add-Computer -DomainName "EncryptionConsulting.com" -NewName "CA02" `
   - RenewalKeyLength=2048, renewal validity 10 years, **LoadDefaultTemplates=0**
     (no default templates installed), AlternateSignatureAlgorithm=0.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Write CAPolicy.inf with the CPS policy (on CA02)</summary>
 
 ```powershell
@@ -365,7 +365,7 @@ AlternateSignatureAlgorithm=0
   - To the HTTP location: copy to `\\SRV1...\C$\CertEnroll\`
   - To the local store: run `certutil -addstore -f root ...`
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Publish the root cert + CRL to AD, HTTP, and local store (on CA02)</summary>
 
 ```powershell
@@ -388,7 +388,7 @@ certutil -addstore -f root "C:\Transfer\EC-Root-CA.crt"
   🔗 *The "signed by CA01 → installed" half cannot proceed until CA01's deferred signing step
   (step 5) returns the issued `.crt`.*
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Install role + configure the subordinate CA, generate the CSR (on CA02)</summary>
 
 ```powershell
@@ -405,7 +405,7 @@ Install-AdcsCertificationAuthority -CAType EnterpriseSubordinateCA `
 
 </details>
 
-<details>
+<details markdown="1">
 <summary>⏳ 💻 PowerShell — Install the signed cert + start the service (on CA02)</summary>
 
 ```powershell
@@ -422,7 +422,7 @@ Start-Service CertSvc
 - Issued-cert validity: `ValidityPeriodUnits 5` / `"Years"` (half the 10-yr CA lifetime)
 - Auditing: Audit Object Access enabled + `CA\AuditFilter 127`
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Apply post-install CA registry settings (on CA02)</summary>
 
 ```powershell
@@ -446,7 +446,7 @@ cert to SRV1's HTTP location. Later, **add the OCSP URL**
 `http://srv1.EncryptionConsulting.com/ocsp` to the AIA extension with *"Include in the
 OCSP extension"* checked (only that box).
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Set AIA URLs + copy the Issuing CA cert to SRV1 (on CA02)</summary>
 
 ```powershell
@@ -459,7 +459,7 @@ Copy-Item "C:\Windows\System32\CertSrv\CertEnroll\*.crt" "\\SRV1\C$\CertEnroll\"
 
 </details>
 
-<details>
+<details markdown="1">
 <summary>⏳ 💻 PowerShell — Add the OCSP URL to the AIA extension (on CA02)</summary>
 
 ```powershell
@@ -477,7 +477,7 @@ Restart-Service CertSvc
 3. `http://pki.EncryptionConsulting.com/CertEnroll/%3%8%9.crl`
 4. `\\srv1.EncryptionConsulting.com\CertEnroll\%3%8%9.crl`
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Set the 4 CDP URLs and publish the CRL (on CA02)</summary>
 
 ```powershell
@@ -497,7 +497,7 @@ what unblock SRV1's OCSP cert and WIN11's client cert downstream.*
   SRV1 can auto-enroll its OCSP signing cert.
 - **Workstation Authentication** — publish it so domain clients (WIN11) can enroll.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Publish the OCSP + Workstation templates (on CA02)</summary>
 
 > **GUI step (ACL) — no clean PowerShell equivalent without PSPKI.** Granting SRV1's computer
@@ -528,7 +528,7 @@ Hosts the HTTP CDP/AIA distribution point and the OCSP responder.
 
 - Join SRV1 to the `EncryptionConsulting.com` domain.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Rename + join the domain (on SRV1)</summary>
 
 ```powershell
@@ -547,7 +547,7 @@ Add-Computer -DomainName "EncryptionConsulting.com" -NewName "SRV1" `
 - **Enable double-escaping** in IIS request filtering
   (`appcmd ... -allowDoubleEscaping:True` + `iisreset`) so it can host **Delta CRLs**.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — IIS + CertEnroll share, vdir, and double-escaping (on SRV1)</summary>
 
 ```powershell
@@ -576,7 +576,7 @@ iisreset
 
 - Install the **AD CS → Online Responder** role service only (clear Certification Authority).
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Install the Online Responder role (on SRV1)</summary>
 
 ```powershell
@@ -593,7 +593,7 @@ Install-AdcsOnlineResponder -Force
   - Disable *Refresh CRLs by validity period*; set the manual refresh interval to **15 min**.
   - Verify the status shows OK under Array Configuration → SRV1.
 
-<details>
+<details markdown="1">
 <summary>⏳ 💻 PowerShell — Add the OCSP revocation configuration (on SRV1)</summary>
 
 > **GUI step — no clean PowerShell equivalent.** There are no first-class cmdlets for an OCSP
@@ -620,7 +620,7 @@ Install-AdcsOnlineResponder -Force
   🔗 *Prereq: CA02 published the OCSP Response Signing template and granted SRV1 Read+Enroll
   (step 6).*
 
-<details>
+<details markdown="1">
 <summary>⏳ 💻 PowerShell — Enroll the OCSP signing certificate (on SRV1)</summary>
 
 ```powershell
@@ -644,7 +644,7 @@ Used to prove the hierarchy works end to end.
 
 - Rename the computer `WIN11` and join the `EncryptionConsulting.com` domain.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Rename + join the domain (on WIN11)</summary>
 
 ```powershell
@@ -662,7 +662,7 @@ Add-Computer -DomainName "EncryptionConsulting.com" -NewName "WIN11" `
     **Certs (from AIA)** all show **Verified**.
   - Run `certutil -verify -urlfetch c:\win11.cer` → full chain + revocation verification.
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Enroll, export, and verify the client cert (on WIN11)</summary>
 
 > Note: `certutil -URL` is an interactive GUI tool and cannot be scripted; the
@@ -700,7 +700,7 @@ Using **Enterprise PKI / PKIView.msc**, all containers should show status **OK**
 - **Certification Authorities Container** — Root CA cert present
 - **Enrollment Services Container** — Issuing CA cert present
 
-<details>
+<details markdown="1">
 <summary>💻 PowerShell — Best-effort health checks (on CA02)</summary>
 
 > **GUI step (inspect-only) — no PKIView cmdlet.** `pkiview.msc` (Enterprise PKI) is a visual

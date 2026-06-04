@@ -1,16 +1,27 @@
 # Jekyll configuration for GitHub Pages
-title: "ADCS Two-Tier PKI Lab"
+title: "Two-Tier PKI Lab Guides"
 description: >-
   Build a two-tier Microsoft ADCS PKI hierarchy — offline root CA, enterprise
   issuing CA, OCSP responder, and HTTP/LDAP CRL+AIA — with side-by-side GUI and
   PowerShell steps.
 
-# Supported GitHub Pages theme (single-column, renders title + description in a header banner).
-theme: jekyll-theme-cayman
+# Theming is provided locally by _layouts/default.html + assets/ (the "iDocs"
+# documentation template ported from CBOM-Documentation), so no theme gem is used.
 
 # --- Site URL ---
 url: "https://arnesh-ec.github.io"
 baseurl: "/PKI-Lab-Guides"
+
+# Single source for the sidebar, breadcrumb and prev/next pagination — all
+# generated statically in _layouts/default.html. Order here = page order.
+# (index.md resolves to url "/", matched specially in the layout.)
+nav:
+  - title: "Home"
+    url: /index.html
+  - title: "PKI Lab — VM Build Guide"
+    url: /vm-building.html
+  - title: "PKI File Types & Concepts"
+    url: /files-and-concepts.html
 
 # Apply the theme's layout to every Markdown page (the two guides only carry empty
 # front matter, so this is what actually themes them).
@@ -20,9 +31,7 @@ defaults:
     values:
       layout: default
 
-# Keep the large source HTML out of the built site.
 exclude:
-  - reference_article.html
   - Gemfile
   - Gemfile.lock
   - README.md

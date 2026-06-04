@@ -4,4 +4,5 @@ _site/
 .jekyll-metadata
 .sass-cache/
 Gemfile.lock
-vendor/
+# Bundler's install dir only — not the theme's assets/vendor/ (leading slash = repo root).
+/vendor/
