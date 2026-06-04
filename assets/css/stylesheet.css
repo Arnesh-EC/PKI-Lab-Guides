@@ -285,13 +285,13 @@ button:active {
   outline: none;
 }
 
-p {
+summary, p {
   line-height: 1.8;
 }
 
 blockquote {
   border-left: 5px solid #eee;
-  padding: 10px 20px;
+  padding: 10px 0px;
 }
 
 iframe {
@@ -332,7 +332,7 @@ ul,
 pre,
 blockquote,
 .table {
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.2rem;
 }
 
 ul {
